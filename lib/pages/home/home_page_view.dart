@@ -1,7 +1,9 @@
+import 'package:expanses_tracker/data/storage_service.dart';
 import 'package:expanses_tracker/model/expense_item_model.dart';
 import 'package:expanses_tracker/pages/home/bloc/home_page_bloc.dart';
 import 'package:expanses_tracker/pages/home/bloc/home_page_event.dart';
 import 'package:expanses_tracker/pages/home/bloc/home_page_state.dart';
+import 'package:expanses_tracker/pages/home/widget/expense_summary.dart';
 import 'package:expanses_tracker/pages/home/widget/home_page_widgets.dart';
 import 'package:expanses_tracker/utils/constant/colors.dart';
 import 'package:expanses_tracker/pages/home/widget/expense_tile.dart';
@@ -69,19 +71,28 @@ class _HomePageViewState extends State<HomePageView> {
       child: BlocBuilder<HomePageBloc, HomePageState>(
         builder: (context, state) {
           return Scaffold(
+            backgroundColor: AppColors.primaryBackground,
             appBar: homePageAppbar(),
             body: Container(
               child: Center(
-                child: ListView.builder(
-                  itemCount: state.allItems.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ExpenseTile(
-                      name: state.allItems[index].name,
-                      amount: state.allItems[index].amount,
-                      dateTime: state.allItems[index].dateTime,
-                      tag: state.allItems[index].tag,
-                    );
-                  },
+                child: ListView(
+                  children: [
+                    ExpenseSummary(
+                        startOfWeek: StorageServices().startOfWeekDay()),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: state.allItems.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ExpenseTile(
+                          name: state.allItems[index].name,
+                          amount: state.allItems[index].amount,
+                          dateTime: state.allItems[index].dateTime,
+                          tag: state.allItems[index].tag,
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
