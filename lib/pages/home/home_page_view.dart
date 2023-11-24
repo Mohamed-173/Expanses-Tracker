@@ -46,12 +46,22 @@ class _HomePageViewState extends State<HomePageView> {
                 children: [
                   TextFormField(
                     controller: name,
+                    validator: (value) {
+                      if (value == null || value == '') {
+                        return "Name Field not Be Empty";
+                      }
+                    },
                     decoration: const InputDecoration(
                       hintText: "Enter Name",
                     ),
                   ),
                   TextFormField(
                     controller: tag,
+                    validator: (value) {
+                      if (value == null || value == '') {
+                        return "Tag Field not Be Empty";
+                      }
+                    },
                     decoration: const InputDecoration(
                       hintText: "Enter Tag",
                     ),
@@ -59,6 +69,10 @@ class _HomePageViewState extends State<HomePageView> {
                   TextFormField(
                     validator: (value) {
                       {
+                        if (value == null || value == '') {
+                          return "Amount Field not Be Empty";
+                        }
+
                         RegExp regex = RegExp(
                             r'^(?=\D*(?:\d\D*){1,12}$)\d+(?:\.\d{1,4})?$');
                         if (!regex.hasMatch(value!)) {
@@ -122,11 +136,17 @@ class _HomePageViewState extends State<HomePageView> {
                       physics: NeverScrollableScrollPhysics(),
                       itemCount: value.getAllItems().length,
                       itemBuilder: (BuildContext context, int index) {
-                        return ExpenseTile(
-                          name: value.getAllItems()[index].name,
-                          amount: value.getAllItems()[index].amount,
-                          dateTime: DateTime.now(),
-                          tag: value.getAllItems()[index].tag,
+                        return Card(
+                          color: AppColors.primaryBackground,
+                          child: ExpenseTile(
+                            name: value.getAllItems()[index].name,
+                            amount: value.getAllItems()[index].amount,
+                            dateTime: DateTime.now(),
+                            tag: value.getAllItems()[index].tag,
+                            deleteTab: (context) {
+                              delete(value.getAllItems()[index]);
+                            },
+                          ),
                         );
                       },
                     ),
@@ -162,6 +182,13 @@ class _HomePageViewState extends State<HomePageView> {
 
     Navigator.of(context).pop();
     clear();
+  }
+
+  void delete(
+    ExpenseItem expenseItem,
+  ) {
+    Provider.of<StorageServices>(context, listen: false)
+        .deleteItem(expenseItem);
   }
 
   void clear() {

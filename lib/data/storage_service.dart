@@ -32,8 +32,10 @@ class StorageServices extends ChangeNotifier {
   }
 
   // update data
-  void deleteItem(ExpenseItem expenseItem, int index) {
-    listAllExpenseItems.elementAt(index);
+  void deleteItem(
+    ExpenseItem expenseItem,
+  ) {
+    listAllExpenseItems.remove(expenseItem);
     notifyListeners();
     db.saveData(listAllExpenseItems);
   }
