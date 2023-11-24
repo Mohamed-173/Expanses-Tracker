@@ -1,12 +1,21 @@
-import 'package:expanses_tracker/pages/home/bloc/home_page_bloc.dart';
+import 'dart:io';
+
+import 'package:expanses_tracker/data/storage_service.dart';
+
 import 'package:expanses_tracker/pages/home/home_page_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'utils/constant/colors.dart';
+import 'package:provider/provider.dart';
 
-void main() {
+import 'utils/constant/colors.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+Future<void> main() async {
+  await Hive.initFlutter();
+
+  await Hive.openBox("expense_database");
   runApp(const MyApp());
 }
 
@@ -16,33 +25,35 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<HomePageBloc>(
-      create: (context) => HomePageBloc(),
-      child: ScreenUtilInit(
-        designSize: const Size(375, 812),
-        builder: (context, child) {
-          return MaterialApp(
-            title: 'Flutter Demo',
-            theme: ThemeData(
-              // primarySwatch: Colors.blue,
-              appBarTheme: const AppBarTheme(
-                iconTheme: IconThemeData(
-                  color: AppColors.primaryText,
+    return ChangeNotifierProvider(
+      create: ((context) => StorageServices()),
+      builder: (context, child) {
+        return ScreenUtilInit(
+          designSize: const Size(375, 812),
+          builder: (context, child) {
+            return MaterialApp(
+              title: 'Flutter Demo',
+              theme: ThemeData(
+                // primarySwatch: Colors.blue,
+                appBarTheme: const AppBarTheme(
+                  iconTheme: IconThemeData(
+                    color: AppColors.primaryText,
+                  ),
+                  color: Colors.white,
+                  centerTitle: true,
+                  elevation: 0,
                 ),
-                color: Colors.white,
-                centerTitle: true,
-                elevation: 0,
+                colorScheme: ColorScheme.fromSwatch()
+                    .copyWith(secondary: AppColors.primaryElement),
               ),
-              colorScheme: ColorScheme.fromSwatch()
-                  .copyWith(secondary: AppColors.primaryElement),
-            ),
-            // home: const HomePageView(),
-            routes: {
-              "/": (context) => const HomePageView(),
-            },
-          );
-        },
-      ),
+              // home: const HomePageView(),
+              routes: {
+                "/": (context) => const HomePageView(),
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

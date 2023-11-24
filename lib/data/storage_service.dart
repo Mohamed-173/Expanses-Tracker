@@ -1,7 +1,10 @@
+import 'package:expanses_tracker/data/hive_database.dart';
 import 'package:expanses_tracker/model/expense_item_model.dart';
 import 'package:expanses_tracker/utils/widgets/date_time_helper.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hive/hive.dart';
 
-class StorageServices {
+class StorageServices extends ChangeNotifier {
 // using shared prefernce for store data and get and just like local api
 
 // list of all data
@@ -13,15 +16,26 @@ class StorageServices {
     return listAllExpenseItems;
   }
 
+  final db = HiveDatabase();
+  void prepareData() {
+    if (db.readData().isNotEmpty) {
+      listAllExpenseItems.addAll(db.readData());
+    }
+  }
+
   // save data
 
   void saveItems(ExpenseItem expenseItem) {
     listAllExpenseItems.add(expenseItem);
+    notifyListeners();
+    db.saveData(listAllExpenseItems);
   }
 
   // update data
   void deleteItem(ExpenseItem expenseItem, int index) {
     listAllExpenseItems.elementAt(index);
+    notifyListeners();
+    db.saveData(listAllExpenseItems);
   }
 
   //delete data
