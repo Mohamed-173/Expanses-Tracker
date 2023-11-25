@@ -31,3 +31,5 @@ class AppColors {
 
   static const Color primaryElementBg = Color.fromARGB(255, 238, 121, 99);
 }
+
+enum TypeAlert { add, update }

@@ -5,6 +5,9 @@ import '../model/expense_item_model.dart';
 class HiveDatabase {
   // getting database for accessing it
   final _myBox = Hive.box("expense_database");
+  void clear() {
+    _myBox.clear();
+  }
 
   // read database
 

@@ -9,6 +9,7 @@ class ExpenseTile extends StatelessWidget {
   final String amount;
   final DateTime dateTime;
   final Function(BuildContext context) deleteTab;
+  final Function(BuildContext context) updateTab;
 
   const ExpenseTile({
     super.key,
@@ -17,24 +18,31 @@ class ExpenseTile extends StatelessWidget {
     required this.dateTime,
     required this.tag,
     required this.deleteTab,
+    required this.updateTab,
   });
 
   @override
   Widget build(BuildContext context) {
     return Slidable(
       endActionPane: ActionPane(
-        motion: StretchMotion(),
+        motion: const StretchMotion(),
         children: [
           SlidableAction(
             backgroundColor: Colors.red,
             onPressed: deleteTab,
             icon: Icons.delete,
           ),
+          SlidableAction(
+            backgroundColor: Colors.grey,
+            onPressed: updateTab,
+            icon: Icons.update,
+          ),
         ],
       ),
       child: ListTile(
         title: Text(name),
-        subtitle: Text("${dateTime.day}/${dateTime.month}/${dateTime.year}"),
+        subtitle: Text(
+            "${dateTime.hour}h:${dateTime.minute}m  ${dateTime.day}/${dateTime.month}/${dateTime.year}"),
         trailing: Column(
           children: [
             CustomTextWidget(

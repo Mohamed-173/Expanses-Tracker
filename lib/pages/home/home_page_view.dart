@@ -32,7 +32,8 @@ class _HomePageViewState extends State<HomePageView> {
     super.initState();
   }
 
-  void addNewExpense() {
+  void showAlertDialog(TypeAlert typeAlert,
+      {int? index, ExpenseItem? expenseItem}) {
     showDialog(
       context: context,
       builder: (context) {
@@ -75,7 +76,7 @@ class _HomePageViewState extends State<HomePageView> {
 
                         RegExp regex = RegExp(
                             r'^(?=\D*(?:\d\D*){1,12}$)\d+(?:\.\d{1,4})?$');
-                        if (!regex.hasMatch(value!)) {
+                        if (!regex.hasMatch(value)) {
                           return 'Enter Valid Number';
                         } else {
                           return null;
@@ -100,8 +101,21 @@ class _HomePageViewState extends State<HomePageView> {
           ),
           actions: [
             MaterialButton(
-              onPressed: save,
-              child: const Text("save"),
+              onPressed: typeAlert == TypeAlert.add
+                  ? save
+                  : () {
+                      update(
+                          ExpenseItem(
+                            name: name.text,
+                            tag: tag.text,
+                            dateTime: DateTime.now(),
+                            amount: amount.text,
+                          ),
+                          index!);
+                      Navigator.of(context).pop();
+                      clear();
+                    },
+              child: Text(typeAlert == TypeAlert.add ? "save" : "update"),
             ),
             MaterialButton(
               onPressed: cancel,
@@ -141,10 +155,29 @@ class _HomePageViewState extends State<HomePageView> {
                           child: ExpenseTile(
                             name: value.getAllItems()[index].name,
                             amount: value.getAllItems()[index].amount,
-                            dateTime: DateTime.now(),
+                            dateTime: value.getAllItems()[index].dateTime,
                             tag: value.getAllItems()[index].tag,
                             deleteTab: (context) {
                               delete(value.getAllItems()[index]);
+                            },
+                            updateTab: (context) {
+                              name.text = value.listAllExpenseItems[index].name;
+                              tag.text = value.listAllExpenseItems[index].tag;
+                              amount.text =
+                                  value.listAllExpenseItems[index].amount;
+                              // showing update alert dialog
+                              showAlertDialog(
+                                TypeAlert.update,
+                                expenseItem: value.listAllExpenseItems[index],
+                                index: index,
+                              );
+                              update(
+                                  ExpenseItem(
+                                      name: name.text,
+                                      tag: tag.text,
+                                      dateTime: DateTime.now(),
+                                      amount: amount.text),
+                                  index);
                             },
                           ),
                         );
@@ -155,7 +188,9 @@ class _HomePageViewState extends State<HomePageView> {
               ),
             ),
             floatingActionButton: FloatingActionButton(
-              onPressed: addNewExpense,
+              onPressed: () {
+                showAlertDialog(TypeAlert.add);
+              },
               child: const Icon(
                 Icons.add,
                 color: AppColors.primaryElementText,
@@ -189,6 +224,12 @@ class _HomePageViewState extends State<HomePageView> {
   ) {
     Provider.of<StorageServices>(context, listen: false)
         .deleteItem(expenseItem);
+  }
+
+  void update(ExpenseItem expenseItem, int index) {
+    print(index);
+    Provider.of<StorageServices>(context, listen: false)
+        .updateItem(expenseItem, index);
   }
 
   void clear() {

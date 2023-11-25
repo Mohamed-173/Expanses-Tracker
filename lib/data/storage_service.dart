@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:expanses_tracker/data/hive_database.dart';
 import 'package:expanses_tracker/model/expense_item_model.dart';
 import 'package:expanses_tracker/utils/widgets/date_time_helper.dart';
@@ -8,20 +10,40 @@ class StorageServices extends ChangeNotifier {
 // using shared prefernce for store data and get and just like local api
 
 // list of all data
-  final List<ExpenseItem> _listAllExpenseItems = [];
-  List<ExpenseItem> get listAllExpenseItems => _listAllExpenseItems;
+  List<ExpenseItem> listAllExpenseItems = [];
 
   // get all data
   List<ExpenseItem> getAllItems() {
     return listAllExpenseItems;
   }
 
-  final db = HiveDatabase();
-  void prepareData() {
-    if (db.readData().isNotEmpty) {
-      listAllExpenseItems.addAll(db.readData());
+  void sortByDate() {
+    for (var i = 0; i < listAllExpenseItems.length; i++) {
+      listAllExpenseItems.sort(
+        (a, b) {
+          var adata = a.dateTime;
+          var bdata = b.dateTime;
+          return adata.compareTo(bdata);
+        },
+      );
     }
   }
+
+  final db = HiveDatabase();
+  Future<void> prepareData() async {
+    if (db.readData().isNotEmpty) {
+      listAllExpenseItems.addAll(db.readData());
+      try {
+        sortByDate();
+      } catch (e) {
+        log(e.toString());
+      }
+    }
+  }
+
+  // void clear() {
+  //   db.clear();
+  // }
 
   // save data
 
@@ -38,6 +60,19 @@ class StorageServices extends ChangeNotifier {
     listAllExpenseItems.remove(expenseItem);
     notifyListeners();
     db.saveData(listAllExpenseItems);
+  }
+
+  void updateItem(ExpenseItem expenseItem, int index) {
+    try {
+      listAllExpenseItems[0] = expenseItem;
+
+      db.saveData(listAllExpenseItems);
+
+      sortByDate();
+    } catch (e) {
+      print(e.toString());
+    }
+    notifyListeners();
   }
 
   //delete data
@@ -80,6 +115,7 @@ class StorageServices extends ChangeNotifier {
 
     for (var item in listAllExpenseItems) {
       String date = convertDateTimeToString(item.dateTime);
+      // String date = item.dateTime;
       double amount = double.parse(item.amount);
 
       if (dailyExpanseSummury.containsKey(date)) {
