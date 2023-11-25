@@ -11,6 +11,24 @@ class StorageServices extends ChangeNotifier {
 
 // list of all data
   List<ExpenseItem> listAllExpenseItems = [];
+  DateTime dateTimePickar = DateTime.now();
+  DateTime dtpk = DateTime.now();
+
+  void checkDateTimeTemp({DateTime? dateTimeNow}) {
+    if (dateTimeNow == null) {
+      return;
+    }
+    if (dateTimePickar != dateTimeNow) {
+      dateTimePickar = dateTimeNow;
+    }
+
+    // notifyListeners();
+  }
+
+  void saveDateTimeTemp(DateTime dateTime) {
+    dateTimePickar = dateTime;
+    notifyListeners();
+  }
 
   // get all data
   List<ExpenseItem> getAllItems() {
@@ -49,6 +67,11 @@ class StorageServices extends ChangeNotifier {
 
   void saveItems(ExpenseItem expenseItem) {
     listAllExpenseItems.add(expenseItem);
+    try {
+      sortByDate();
+    } catch (e) {
+      log(e.toString());
+    }
     notifyListeners();
     db.saveData(listAllExpenseItems);
   }

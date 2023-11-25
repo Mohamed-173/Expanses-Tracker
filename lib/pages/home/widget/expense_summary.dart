@@ -40,7 +40,16 @@ class ExpenseSummary extends StatelessWidget {
 
     values.sort();
     max = values.last * 1;
-    return max == 0 ? 100 : max;
+    // int totalpayes = 0;
+    double totalAmount = weekTotalAmount(
+        value, saturday, sunday, monday, tuesday, wednesday, thursday, friday);
+
+    // for (var i = 0; i < values.length; i++) {
+    //   if (values[i] != 0) {
+    //     totalpayes++;
+    //   }
+    // }
+    return max == 0 ? 100 : totalAmount;
   }
 
   double weekTotalAmount(
@@ -61,13 +70,16 @@ class ExpenseSummary extends StatelessWidget {
       value.calculateDailyExpanseSummury()[monday] ?? 0,
       value.calculateDailyExpanseSummury()[tuesday] ?? 0,
       value.calculateDailyExpanseSummury()[wednesday] ?? 0,
-      value.calculateDailyExpanseSummury()[tuesday] ?? 0,
+      value.calculateDailyExpanseSummury()[thursday] ?? 0,
       value.calculateDailyExpanseSummury()[friday] ?? 0,
     ];
 
+    print("totallenth${values.length}");
     for (var i = 0; i < values.length; i++) {
       totalAmount += values[i];
     }
+
+    print("totallenth${totalAmount}");
     return totalAmount;
   }
 
